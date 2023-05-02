@@ -608,9 +608,6 @@ get the information of the specified event.
 
 - `info:table`: information of the event.
   - `ident:number`: identifier of the event.
-  - `flags:string`: flags of the event.
-  - `fflags:string`: filter flags of the event.
-  - `data:number`: data of the event.
   - `udata:any`: user data of the event.
   - `edge:boolean`: `true` if the event trigger is edge trigger.
   - `oneshot:boolean`: `true` if the event type is one-shot event.
