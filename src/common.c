@@ -22,11 +22,33 @@
 
 #include "lua_epoll.h"
 
+static inline void event_closefd(poll_event_t *ev)
+{
+    switch (ev->filter) {
+    case EVFILT_READ:
+    case EVFILT_WRITE:
+        // close duplicated fd
+        if (ev->reg_evt.data.fd != ev->ident) {
+            close(ev->reg_evt.data.fd);
+            ev->reg_evt.data.fd = -1;
+        }
+        break;
+
+    case EVFILT_SIGNAL:
+    case EVFILT_TIMER:
+        // close signalfd or timerfd
+        close(ev->reg_evt.data.fd);
+        ev->reg_evt.data.fd = -1;
+        break;
+    }
+}
+
 int poll_event_gc_lua(lua_State *L)
 {
     poll_event_t *ev = lua_touserdata(L, 1);
     unref(L, ev->ref_poll);
     unref(L, ev->ref_udata);
+    event_closefd(ev);
     return 0;
 }
 
@@ -82,6 +104,9 @@ int poll_event_revert_lua(lua_State *L, const char *tname)
         lua_pushinteger(L, errno);
         return 3;
     }
+
+    event_closefd(ev);
+    ev->filter    = 0;
     ev->reg_evt   = (event_t){0};
     ev->occ_evt   = (event_t){0};
     ev->ref_udata = unref(L, ev->ref_udata);
