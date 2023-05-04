@@ -59,12 +59,14 @@ function testcase.watch_unwatch()
         assert(signal.kill(signal.SIGUSR2, pid))
         return
     end
-
     local nevt = assert(ep:wait())
-    -- assert(signal.unblock(signal.SIGUSR2))
     assert.equal(nevt, 1)
     local oev = assert(ep:consume())
     assert.equal(oev, ev)
+
+    -- test that event does not occur when signal is not received
+    nevt = assert(ep:wait(10))
+    assert.equal(nevt, 0)
 
     -- test that return true if event is unwatched
     ok, err, errnum = ev:unwatch()
