@@ -21,6 +21,7 @@
  */
 
 #include "lua_epoll.h"
+#include <sys/signalfd.h>
 
 static int check_event_status(lua_State *L, poll_event_t *ev)
 {
@@ -36,6 +37,25 @@ static int check_event_status(lua_State *L, poll_event_t *ev)
             return POLL_ERROR;
         }
         return EV_EOF;
+    }
+
+    // drain event data
+    union {
+        struct signalfd_siginfo siginfo;
+        uint64_t nexpires;
+    } data;
+    int size = sizeof(uint64_t);
+    switch (ev->filter) {
+    case EVFILT_SIGNAL:
+        size = sizeof(struct signalfd_siginfo);
+    case EVFILT_TIMER:
+        if (read(ev->reg_evt.data.fd, (void *)&data, size) == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return POLL_EAGAIN;
+            }
+            return POLL_ERROR;
+        }
+        break;
     }
 
     return POLL_OK;

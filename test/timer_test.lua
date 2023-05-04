@@ -36,7 +36,7 @@ end
 function testcase.watch_unwatch()
     local ep = assert(epoll.new())
     local ev = ep:new_event()
-    assert(ev:as_timer(1, 10))
+    assert(ev:as_timer(1, 100))
 
     -- test that return false without error if event is already watched
     local ok, err, errnum = ev:watch()
@@ -44,11 +44,15 @@ function testcase.watch_unwatch()
     assert.is_nil(err)
     assert.is_nil(errnum)
 
-    -- test that event occurs when signal is received
+    -- test that event occurs when timer is expired
     local nevt = assert(ep:wait())
     assert.equal(nevt, 1)
     local oev = assert(ep:consume())
     assert.equal(oev, ev)
+
+    -- test that event not occurs if timer is not expired
+    nevt = assert(ep:wait(5))
+    assert.equal(nevt, 0)
 
     -- test that return true if event is watched
     ok, err, errnum = ev:unwatch()
