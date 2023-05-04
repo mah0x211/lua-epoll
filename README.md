@@ -22,13 +22,13 @@ it returns `true` if the epoll is usable.
 - `ok:boolean`: `true` on if the epoll is usable.
 
 
-## ep, err = epoll.new()
+## ep, err, errno = epoll.new()
 
 create a new epoll instance.
 
 **Returns**
 
-- `ep:epoll`: epoll instance.
+- `ep:epoll?`: epoll instance, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -81,7 +81,7 @@ wait for events. it consumes all remaining events before waiting for new events.
 
 **Returns**
 
-- `n:number`: the number of events.
+- `n:number?`: the number of events, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -103,7 +103,7 @@ print('n:', n)
 ```
 
 
-## ev, udata, errno = ep:consume()
+## ev?, udata, errno = ep:consume()
 
 consume the occurred event.
 
@@ -111,7 +111,7 @@ consume the occurred event.
 
 **Returns**
 
-- `ev:epoll.event`: `epoll.event` instance.
+- `ev:epoll.event?`: `epoll.event` instance, or `nil` if error occurred.
 - `udata:any`: udata will be treated as the following.
     - `any`: the event is occurred and the `udata` is set.
     - `nil`: the event is not occurred.
@@ -244,7 +244,7 @@ this method is change the meta-table of the `ev` to `epoll.read`.
 
 **Returns**
 
-- `ev:epoll.read`: `epoll.read` instance that is changed the meta-table of the `ev`.
+- `ev:epoll.read?`: `epoll.read` instance that is changed the meta-table of the `ev`, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -292,7 +292,7 @@ this method is change the meta-table of the `ev` to `epoll.write`.
 
 **Returns**
 
-- `ev:epoll.write`: `epoll.write` instance that is changed the meta-table of the `ev`.
+- `ev:epoll.write?`: `epoll.write` instance that is changed the meta-table of the `ev`, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -339,7 +339,7 @@ this method is change the meta-table of the `ev` to `epoll.signal`.
 
 **Returns**
 
-- `ev:epoll.signal`: `epoll.signal` instance that is changed the meta-table of the `ev`.
+- `ev:epoll.signal?`: `epoll.signal` instance that is changed the meta-table of the `ev`, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -389,7 +389,7 @@ this method is change the meta-table of the `ev` to `epoll.timer`.
 
 **Returns**
 
-- `ev:epoll.timer`: `epoll.timer` instance that is changed the meta-table of the `ev`.
+- `ev:epoll.timer?`: `epoll.timer` instance that is changed the meta-table of the `ev`, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -465,7 +465,7 @@ revert the event to the `epoll.event` instance. if the event is enabled then it 
 
 **Returns**
 
-- `ev:epoll.event`: `epoll.event` instance that is reverted the meta-table of the `ev`.
+- `ev:epoll.event?`: `epoll.event` instance that is reverted the meta-table of the `ev`, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -541,7 +541,7 @@ return `true` if the event trigger is edge trigger.
 - `ok:boolean`: `true` if the event trigger is edge trigger.
 
 
-## ok = ev:as_edge()
+## ok, err, errno = ev:as_edge()
 
 change the event trigger to edge trigger.
 
@@ -550,6 +550,8 @@ change the event trigger to edge trigger.
 **Returns**
 
 - `ok:boolean`: `true` on success.
+- `err:string`: error string.
+- `errno:number`: error number.
 
 
 ## ok = ev:is_oneshot()
@@ -561,7 +563,7 @@ return `true` if the event type is one-shot event.
 - `ok:boolean`: `true` if the event type is one-shot event.
 
 
-## ok = ev:as_oneshot()
+## ok, err, errno = ev:as_oneshot()
 
 change the event type to one-shot event.
 
@@ -570,6 +572,8 @@ change the event type to one-shot event.
 **Returns**
 
 - `ok:boolean`: `true` on success.
+- `err:string`: error string.
+- `errno:number`: error number.
 
 
 ## ident = ev:ident()
@@ -592,7 +596,7 @@ if the `udata` is specified then it set the user data of the event and return th
 - `udata:any`: user data of the event.
 
 
-## info, err, errno = ev:getinfo( event )
+## info = ev:getinfo( event )
 
 get the information of the specified event.
 
@@ -611,6 +615,4 @@ get the information of the specified event.
   - `udata:any`: user data of the event.
   - `edge:boolean`: `true` if the event trigger is edge trigger.
   - `oneshot:boolean`: `true` if the event type is one-shot event.
-- `err:string`: error string.
-- `errno:number`: error number.
 
