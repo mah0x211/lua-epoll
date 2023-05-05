@@ -264,7 +264,13 @@ int poll_unwatch_event(lua_State *L, poll_event_t *ev)
 
     // unregister event
     if (epoll_ctl(ev->p->fd, EPOLL_CTL_DEL, ev->reg_evt.data.fd, NULL) == -1) {
-        return POLL_ERROR;
+        switch (errno) {
+        case EBADF:
+        case ENOENT:
+            break;
+        default:
+            return POLL_ERROR;
+        }
     }
     ev->enabled = 0;
     poll_evset_del(L, ev);
