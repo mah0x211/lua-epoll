@@ -77,7 +77,7 @@ wait for events. it consumes all remaining events before waiting for new events.
 
 **Parameters**
 
-- `msec:number`: timeout in milliseconds. if the value is `nil` or `<=0` then it waits forever.
+- `msec:number`: timeout in milliseconds. if the value is `nil` or `<0` then it waits forever.
 
 **Returns**
 
@@ -427,21 +427,6 @@ end
 ## Common Methods
 
 the following methods are common methods of the `epoll.read`, `epoll.write`, `epoll.signal` and `epoll.timer` instances.
-
-
-## ok, err, errno = ev:renew( [ep] )
-
-rewatch the event. if the `ep` is specified then it rewatch the event with the specified epoll instance.
-
-**Parameters**
-
-- `ep:epoll`: `epoll` instance.
-
-**Returns**
-
-- `ok:boolean`: `true` on success.
-- `err:string`: error string.
-- `errno:number`: error number.
 
 
 ## ok, err, errno = ev:renew( [ep] )
