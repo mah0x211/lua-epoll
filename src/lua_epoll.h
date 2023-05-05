@@ -132,7 +132,6 @@ void poll_evset_del(lua_State *L, poll_event_t *ev);
 #define POLL_ERROR    -1
 #define POLL_OK       0
 #define POLL_EALREADY 1
-#define POLL_EAGAIN   2
 
 int poll_watch_event(lua_State *L, poll_event_t *ev, int poll_event_idx);
 int poll_unwatch_event(lua_State *L, poll_event_t *ev);

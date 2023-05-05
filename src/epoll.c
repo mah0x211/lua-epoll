@@ -25,12 +25,14 @@
 
 static int check_event_status(lua_State *L, poll_event_t *ev)
 {
+    int rc = POLL_OK;
+
     if (ev->reg_evt.events & EV_ONESHOT) {
         // oneshot event must be removed from the event set table and manually
         // disable event
         poll_evset_del(L, ev);
         ev->enabled = 0;
-        return EV_ONESHOT;
+        rc          = EV_ONESHOT;
     } else if (ev->occ_evt.events & (EV_EOF | EV_ERROR)) {
         // event should be disabled when error occurred or EV_EOF is set
         if (poll_unwatch_event(L, ev) == POLL_ERROR) {
@@ -50,15 +52,12 @@ static int check_event_status(lua_State *L, poll_event_t *ev)
         size = sizeof(struct signalfd_siginfo);
     case EVFILT_TIMER:
         if (read(ev->reg_evt.data.fd, (void *)&data, size) == -1) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                return POLL_EAGAIN;
-            }
             return POLL_ERROR;
         }
         break;
     }
 
-    return POLL_OK;
+    return rc;
 }
 
 static int consume_lua(lua_State *L)

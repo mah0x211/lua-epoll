@@ -140,7 +140,7 @@ int poll_timer_new(lua_State *L)
     }
 
     // create timerfd
-    int fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
+    int fd = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC);
     if (fd == -1) {
         lua_pushnil(L);
         lua_pushstring(L, strerror(errno));
