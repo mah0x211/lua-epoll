@@ -168,7 +168,7 @@ static int wait_lua(lua_State *L)
     }
 
     int nevt = 0;
-    if (msec <= 0) {
+    if (msec < 0) {
         // wait event forever
         nevt = epoll_wait(p->fd, p->evlist, p->nreg, -1);
     } else {
