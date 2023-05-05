@@ -134,7 +134,7 @@ int poll_signal_new(lua_State *L)
     sigset_t ss;
     sigemptyset(&ss);
     sigaddset(&ss, signo);
-    int fd = signalfd(-1, &ss, SFD_NONBLOCK | SFD_CLOEXEC);
+    int fd = signalfd(-1, &ss, SFD_CLOEXEC);
     if (fd == -1) {
         lua_pushnil(L);
         lua_pushstring(L, strerror(errno));
