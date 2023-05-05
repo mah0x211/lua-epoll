@@ -50,6 +50,18 @@ function testcase.revert()
     assert.match(ev, '^epoll%.event: ', false)
 end
 
+function testcase.revert_after_fd_closed()
+    local ep = assert(epoll.new())
+    local ev = ep:new_event()
+    assert(ev:as_read(Reader:fd()))
+    assert.match(ev, '^epoll%.read: ', false)
+
+    -- test that revert event to initial state
+    Reader:close()
+    assert(ev:revert())
+    assert.match(ev, '^epoll%.event: ', false)
+end
+
 function testcase.watch_unwatch()
     local ep = assert(epoll.new())
     local ev = ep:new_event()
