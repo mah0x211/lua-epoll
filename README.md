@@ -444,21 +444,6 @@ rewatch the event. if the `ep` is specified then it rewatch the event with the s
 - `errno:number`: error number.
 
 
-## ok, err, errno = ev:renew( [ep] )
-
-rewatch the event. if the `ep` is specified then it rewatch the event with the specified epoll instance.
-
-**Parameters**
-
-- `ep:epoll`: `epoll` instance.
-
-**Returns**
-
-- `ok:boolean`: `true` on success.
-- `err:string`: error string.
-- `errno:number`: error number.
-
-
 ## ev, err, errno = ev:revert()
 
 revert the event to the `epoll.event` instance. if the event is enabled then it disable the event.
