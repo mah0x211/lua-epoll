@@ -125,7 +125,7 @@ int poll_evset_getflag(lua_State *L, int ref_filter_evset, int ident)
         lua_pop(L, 2);
         return 1;
     }
-    lua_pop(L, 1);
+    lua_pop(L, 2);
     return 0;
 }
 
