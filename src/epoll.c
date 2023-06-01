@@ -28,11 +28,11 @@ static int check_event_status(lua_State *L, poll_event_t *ev)
     int rc = POLL_OK;
 
     if (ev->reg_evt.events & EV_ONESHOT) {
-        // oneshot event must be removed from the event set table and manually
-        // disable event
-        poll_evset_del(L, ev);
-        ev->enabled = 0;
-        rc          = EV_ONESHOT;
+        // oneshot event should be disabled
+        if (poll_unwatch_event(L, ev) == POLL_ERROR) {
+            return POLL_ERROR;
+        }
+        rc = EV_ONESHOT;
     } else if (ev->occ_evt.events & (EV_EOF | EV_ERROR)) {
         // event should be disabled when error occurred or EV_EOF is set
         if (poll_unwatch_event(L, ev) == POLL_ERROR) {

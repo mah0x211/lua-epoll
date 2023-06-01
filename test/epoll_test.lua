@@ -213,6 +213,13 @@ function testcase.oneshot_event_will_be_disabled_in_consume()
     -- test that onshot-event will be deleted after event occurred
     assert.equal(#ep, 0)
     assert.equal(assert(ep:wait(10)), 0)
+
+    -- test that fd will be deleted from epoll after event occurred
+    ev = ep:new_event()
+    ev:as_oneshot()
+    assert(ev:as_read(Reader:fd(), {
+        'context',
+    }))
 end
 
 function testcase.edge_triggered_event_will_not_repeat()
