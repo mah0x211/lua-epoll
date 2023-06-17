@@ -29,9 +29,13 @@ for header, funcs in pairs({
     else
         print(' available')
         for _, func in ipairs(funcs) do
+            io.stdout:write('check function: ', func, ' ...')
             ok, err = cfgh:check_func(header, func)
             if not ok then
-                print(err)
+                print(' not available')
+                print('  >  ' .. string.gsub(err, '\n', '\n  >  '))
+            else
+                print(' available')
             end
         end
     end
