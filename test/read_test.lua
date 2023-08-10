@@ -112,53 +112,6 @@ function testcase.is_enabled()
     assert.is_false(ev:is_enabled())
 end
 
-function testcase.as_level_is_level()
-    local ep = assert(epoll.new())
-    local ev = ep:new_event()
-    assert(ev:as_read(Reader:fd()))
-    ev:unwatch()
-
-    -- test that remove the oneshot flags
-    assert(ev:as_oneshot())
-    assert.is_false(ev:is_level())
-    assert(ev:as_level())
-    assert.is_true(ev:is_level())
-
-    -- test that remove the edge flag
-    assert(ev:as_edge())
-    assert.is_false(ev:is_level())
-    assert(ev:as_level())
-    assert.is_true(ev:is_level())
-
-    -- test that return error if event is in-progress
-    assert(ev:watch())
-    local err, errnum
-    ev, err, errnum = ev:as_level()
-    assert.is_nil(ev)
-    assert.equal(err, errno.EINPROGRESS.message)
-    assert.equal(errnum, errno.EINPROGRESS.code)
-end
-
-function testcase.as_edge_is_edge()
-    local ep = assert(epoll.new())
-    local ev = ep:new_event()
-    assert(ev:as_read(Reader:fd()))
-    ev:unwatch()
-
-    -- test that set the edge flags
-    assert.is_false(ev:is_edge())
-    assert(ev:as_edge())
-    assert.is_true(ev:is_edge())
-
-    -- test that return error if event is in-progress
-    assert(ev:watch())
-    local err, errnum
-    ev, err, errnum = ev:as_edge()
-    assert.is_nil(ev)
-    assert.equal(err, errno.EINPROGRESS.message)
-    assert.equal(errnum, errno.EINPROGRESS.code)
-end
-
 function testcase.as_oneshot_is_oneshot()
     local ep = assert(epoll.new())
     local ev = ep:new_event()

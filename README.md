@@ -169,47 +169,6 @@ rewatch the event. if the `ep` is specified then it rewatch the event with the s
 - `errno:number`: error number.
 
 
-## ok = ev:is_level()
-
-return `true` if the event trigger is level trigger.
-
-**Returns**
-
-- `ok:boolean`: `true` if the event trigger is level trigger.
-
-
-## ok = ev:as_level()
-
-change the event trigger to level trigger.
-
-**NOTE:** the level trigger is a trigger that is activated while the state of the target is active.
-
-
-**Returns**
-
-- `ok:boolean`: `true` on success.
-
-
-## ok = ev:is_edge()
-
-return `true` if the event trigger is edge trigger.
-
-**Returns**
-
-- `ok:boolean`: `true` if the event trigger is edge trigger.
-
-
-## ok = ev:as_edge()
-
-change the event trigger to edge trigger.
-
-**NOTE:** the edge trigger is a trigger that is activated only when the state of the target changes from inactive to active.
-
-**Returns**
-
-- `ok:boolean`: `true` on success.
-
-
 ## ok = ev:is_oneshot()
 
 return `true` if the event type is one-shot event.
@@ -493,50 +452,6 @@ return `true` if the event is enabled (watching).
 **Returns**
 
 - `ok:boolean`: `true` if the event is enabled (watching).
-
-
-## ok = ev:is_level()
-
-return `true` if the event trigger is level trigger.
-
-**Returns**
-
-- `ok:boolean`: `true` if the event trigger is level trigger.
-
-
-## ok, err, errno = ev:as_level()
-
-change the event trigger to level trigger.
-
-**NOTE:** if the event is enabled, it can not be changed.
-
-**Returns**
-
-- `ok:boolean`: `true` on success.
-- `err:string`: error string.
-- `errno:number`: error number.
-
-
-## ok = ev:is_edge()
-
-return `true` if the event trigger is edge trigger.
-
-**Returns**
-
-- `ok:boolean`: `true` if the event trigger is edge trigger.
-
-
-## ok, err, errno = ev:as_edge()
-
-change the event trigger to edge trigger.
-
-**NOTE:** if the event is enabled, it can not be changed.
-
-**Returns**
-
-- `ok:boolean`: `true` on success.
-- `err:string`: error string.
-- `errno:number`: error number.
 
 
 ## ok = ev:is_oneshot()

@@ -140,10 +140,6 @@ int poll_event_watch_lua(lua_State *L, const char *tname);
 int poll_event_unwatch_lua(lua_State *L, const char *tname);
 
 int poll_event_is_enabled_lua(lua_State *L, const char *tname);
-int poll_event_is_level_lua(lua_State *L, const char *tname);
-int poll_event_as_level_lua(lua_State *L, const char *tname);
-int poll_event_is_edge_lua(lua_State *L, const char *tname);
-int poll_event_as_edge_lua(lua_State *L, const char *tname);
 int poll_event_is_oneshot_lua(lua_State *L, const char *tname);
 int poll_event_as_oneshot_lua(lua_State *L, const char *tname);
 int poll_event_ident_lua(lua_State *L, const char *tname);

@@ -34,26 +34,6 @@ static int is_oneshot_lua(lua_State *L)
     return poll_event_is_oneshot_lua(L, MODULE_MT);
 }
 
-static int as_edge_lua(lua_State *L)
-{
-    return poll_event_as_edge_lua(L, MODULE_MT);
-}
-
-static int is_edge_lua(lua_State *L)
-{
-    return poll_event_is_edge_lua(L, MODULE_MT);
-}
-
-static int as_level_lua(lua_State *L)
-{
-    return poll_event_as_level_lua(L, MODULE_MT);
-}
-
-static int is_level_lua(lua_State *L)
-{
-    return poll_event_is_level_lua(L, MODULE_MT);
-}
-
 static int renew_lua(lua_State *L)
 {
     return poll_event_renew_lua(L, MODULE_MT);
@@ -78,10 +58,6 @@ void libopen_poll_event(lua_State *L)
     };
     struct luaL_Reg method[] = {
         {"renew",      renew_lua      },
-        {"is_level",   is_level_lua   },
-        {"as_level",   as_level_lua   },
-        {"is_edge",    is_edge_lua    },
-        {"as_edge",    as_edge_lua    },
         {"is_oneshot", is_oneshot_lua },
         {"as_oneshot", as_oneshot_lua },
         {"as_read",    poll_raed_new  },

@@ -335,61 +335,6 @@ int poll_event_is_enabled_lua(lua_State *L, const char *tname)
     return 1;
 }
 
-int poll_event_is_level_lua(lua_State *L, const char *tname)
-{
-    poll_event_t *ev = luaL_checkudata(L, 1, tname);
-    lua_pushboolean(
-        L, !(ev->reg_evt.events & ~(EPOLLIN | EPOLLOUT | EPOLLEXCLUSIVE)));
-    return 1;
-}
-
-int poll_event_as_level_lua(lua_State *L, const char *tname)
-{
-    poll_event_t *ev = luaL_checkudata(L, 1, tname);
-
-    if (ev->enabled) {
-        // event is in use
-        errno = EINPROGRESS;
-        lua_pushnil(L);
-        lua_pushstring(L, strerror(errno));
-        lua_pushinteger(L, errno);
-        return 3;
-    }
-
-    // treat event as level-triggered event
-    ev->reg_evt.events &= ~(EV_ONESHOT | EV_CLEAR);
-    ev->reg_evt.events |= EPOLLEXCLUSIVE;
-    lua_settop(L, 1);
-    return 1;
-}
-
-int poll_event_is_edge_lua(lua_State *L, const char *tname)
-{
-    poll_event_t *ev = luaL_checkudata(L, 1, tname);
-    lua_pushboolean(L, ev->reg_evt.events & EV_CLEAR);
-    return 1;
-}
-
-int poll_event_as_edge_lua(lua_State *L, const char *tname)
-{
-    poll_event_t *ev = luaL_checkudata(L, 1, tname);
-
-    if (ev->enabled) {
-        // event is in use
-        errno = EINPROGRESS;
-        lua_pushnil(L);
-        lua_pushstring(L, strerror(errno));
-        lua_pushinteger(L, errno);
-        return 3;
-    }
-
-    // treat event as edge-triggered event
-    ev->reg_evt.events &= ~EV_ONESHOT;
-    ev->reg_evt.events |= (EV_CLEAR | EPOLLEXCLUSIVE);
-    lua_settop(L, 1);
-    return 1;
-}
-
 int poll_event_is_oneshot_lua(lua_State *L, const char *tname)
 {
     poll_event_t *ev = luaL_checkudata(L, 1, tname);

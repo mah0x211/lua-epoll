@@ -222,36 +222,3 @@ function testcase.oneshot_event_will_be_disabled_in_consume()
     }))
 end
 
-function testcase.edge_triggered_event_will_not_repeat()
-    local ep = assert(epoll.new())
-    assert(Writer:write('test'))
-    local ev = ep:new_event()
-    ev:as_edge()
-    assert(ev:as_read(Reader:fd(), {
-        'context',
-    }))
-
-    -- test that edge-trigger event
-    assert.equal(assert(ep:wait()), 1)
-    local oev, ctx, disabled = assert(ep:consume())
-    assert.equal(oev, ev)
-    assert.equal(ctx, {
-        'context',
-    })
-    assert.is_nil(disabled)
-    assert.equal(ev:getinfo('occurred'), {
-        ident = Reader:fd(),
-        udata = {
-            'context',
-        },
-    })
-    assert.equal(#ep, 1)
-
-    -- test that event does not occur repeatedly
-    assert.equal(assert(ep:wait(10)), 0)
-
-    -- test that event occur if descriptor has changed
-    assert(Writer:write('test'))
-    assert.equal(assert(ep:wait()), 1)
-end
-

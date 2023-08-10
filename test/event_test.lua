@@ -39,33 +39,6 @@ function testcase.renew()
     assert.match(err, 'epoll expected')
 end
 
-function testcase.as_level_is_level()
-    local ep = assert(epoll.new())
-    local ev = ep:new_event()
-
-    -- test that remove the oneshot flags
-    assert(ev:as_oneshot())
-    assert.is_false(ev:is_level())
-    assert.equal(ev:as_level(), ev)
-    assert.is_true(ev:is_level())
-
-    -- test that remove the edge flag
-    assert(ev:as_edge())
-    assert.is_false(ev:is_level())
-    assert.equal(ev:as_level(), ev)
-    assert.is_true(ev:is_level())
-end
-
-function testcase.as_edge_is_edge()
-    local ep = assert(epoll.new())
-    local ev = ep:new_event()
-
-    -- test that set the edge flags
-    assert.is_false(ev:is_edge())
-    assert.equal(ev:as_edge(), ev)
-    assert.is_true(ev:is_edge())
-end
-
 function testcase.as_oneshot_is_oneshot()
     local ep = assert(epoll.new())
     local ev = ep:new_event()
