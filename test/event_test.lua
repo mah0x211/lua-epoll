@@ -24,6 +24,14 @@ function testcase.before_each()
     Reader, Writer = assert(socketpair())
 end
 
+function testcase.type()
+    local ep = assert(epoll.new())
+    local ev = ep:new_event()
+
+    -- test that get the event type
+    assert.equal(ev:type(), 'event')
+end
+
 function testcase.renew()
     local ep1 = assert(epoll.new())
     local ep2 = assert(epoll.new())
