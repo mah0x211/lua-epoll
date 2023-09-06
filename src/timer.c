@@ -115,10 +115,10 @@ int poll_timer_new(lua_State *L)
 {
     poll_event_t *ev = luaL_checkudata(L, 1, POLL_EVENT_MT);
     int ident        = luaL_checkinteger(L, 2);
-    int msec         = luaL_checkinteger(L, 3);
+    lua_Number sec   = luaL_checknumber(L, 3);
 
-    // check if msec is valid
-    if (msec < 0) {
+    // check if sec is valid
+    if (sec < 0) {
         errno = EINVAL;
         lua_pushnil(L);
         lua_pushstring(L, strerror(errno));
@@ -136,11 +136,11 @@ int poll_timer_new(lua_State *L)
     }
 
     struct itimerspec its = {0};
-    if (msec) {
-        // convert msec to interval-timespec
-        its.it_interval =
-            (struct timespec){.tv_sec  = (time_t)msec / 1000,
-                              .tv_nsec = (long)((msec % 1000) * 1000000)};
+    if (sec) {
+        // convert sec to interval-timespec
+        its.it_interval.tv_sec = sec;
+        its.it_interval.tv_nsec =
+            (sec - (lua_Number)its.it_interval.tv_sec) * 1000000000;
         // set first invocation time
         its.it_value = its.it_interval;
     }
