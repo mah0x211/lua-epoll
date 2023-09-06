@@ -99,7 +99,7 @@ function testcase.wait()
     Reader:read()
 
     -- test that return 0 if timeout
-    nevt = assert(ep:wait(10))
+    nevt = assert(ep:wait(0.01))
     assert.equal(nevt, 0)
 
     -- test that event occurred repeatedly as default
@@ -212,7 +212,7 @@ function testcase.oneshot_event_will_be_disabled_in_consume()
 
     -- test that onshot-event will be deleted after event occurred
     assert.equal(#ep, 0)
-    assert.equal(assert(ep:wait(10)), 0)
+    assert.equal(assert(ep:wait(0.01)), 0)
 
     -- test that fd will be deleted from epoll after event occurred
     ev = ep:new_event()
@@ -248,7 +248,7 @@ function testcase.edge_triggered_event_will_not_repeat()
     assert.equal(#ep, 1)
 
     -- test that event does not occur repeatedly
-    assert.equal(assert(ep:wait(10)), 0)
+    assert.equal(assert(ep:wait(0.01)), 0)
 
     -- test that event occur if descriptor has changed
     assert(Writer:write('test'))

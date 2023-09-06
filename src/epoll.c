@@ -140,9 +140,10 @@ static int cleanup_unconsumed_events(lua_State *L, poll_t *p)
 
 static int wait_lua(lua_State *L)
 {
-    poll_t *p        = luaL_checkudata(L, 1, POLL_MT);
+    poll_t *p      = luaL_checkudata(L, 1, POLL_MT);
     // default timeout: -1(never timeout)
-    lua_Integer msec = luaL_optinteger(L, 2, -1);
+    lua_Number sec = luaL_optnumber(L, 2, -1);
+    int msec       = sec * 1000;
 
     // cleanup current events
     if (cleanup_unconsumed_events(L, p) == POLL_ERROR) {

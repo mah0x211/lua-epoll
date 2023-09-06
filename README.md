@@ -71,13 +71,13 @@ create a new `epoll.event` instance.
 - `ev:epoll.event`: `epoll.event` instance.
 
 
-## n, err, errno = ep:wait( [msec] )
+## n, err, errno = ep:wait( [sec] )
 
 wait for events. it consumes all remaining events before waiting for new events.
 
 **Parameters**
 
-- `msec:number`: timeout in milliseconds. if the value is `nil` or `<0` then it waits forever.
+- `sec:number`: timeout in seconds. if the value is `nil` or `<0` then it waits forever.
 
 **Returns**
 
@@ -375,7 +375,7 @@ while true do
 end
 ```
 
-## ev, err, errno = ev:as_timer( ident, msec [, udata] )
+## ev, err, errno = ev:as_timer( ident, sec [, udata] )
 
 register a event that watches the timer until it becomes expired.
 
@@ -384,7 +384,7 @@ this method is change the meta-table of the `ev` to `epoll.timer`.
 **Parameters**
 
 - `ident:number`: timer identifier.
-- `msec:number`: timer interval in milliseconds.
+- `sec:number`: timer interval in seconds.
 - `udata:any`: user data.
 
 **Returns**

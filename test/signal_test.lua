@@ -74,7 +74,7 @@ function testcase.watch_unwatch()
     assert.equal(oev, ev)
 
     -- test that event does not occur when signal is not received
-    nevt = assert(ep:wait(10))
+    nevt = assert(ep:wait(0.01))
     assert.equal(nevt, 0)
 
     -- test that return true if event is unwatched
