@@ -31,6 +31,8 @@ static int check_event_status(lua_State *L, poll_event_t *ev)
         // oneshot event should be disabled
         if (poll_unwatch_event(L, ev) == POLL_ERROR) {
             return POLL_ERROR;
+        } else if (ev->occ_evt.events & (EV_EOF | EV_ERROR)) {
+            return EV_EOF;
         }
         rc = EV_ONESHOT;
     } else if (ev->occ_evt.events & (EV_EOF | EV_ERROR)) {
@@ -95,9 +97,12 @@ RECONSUME:
         return 2;
 
     case EV_ONESHOT:
-    case EV_EOF:
         lua_pushboolean(L, 1);
         return 3;
+    case EV_EOF:
+        lua_pushboolean(L, 1);
+        lua_pushboolean(L, 1);
+        return 4;
 
     default:
         lua_pop(L, 2);

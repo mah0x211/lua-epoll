@@ -103,7 +103,7 @@ print('n:', n)
 ```
 
 
-## ev, udata|err, disabled|errno = ep:consume()
+## ev, udata|err, disabled|errno, eof = ep:consume()
 
 consume the occurred event.
 
@@ -111,12 +111,14 @@ consume the occurred event.
 
 - if error occurred, the `udata` will be treated as the error message, and the `disabled` will be treated as error number.
 - if it is a one-shot event, or if the event flag is set to `EPOLLHUP`, `EPOLLRDHUP` or `EPOLLERR`, the event is automatically unregistered and `disabled` is set to `true`.
+- if the event flag is set to `EPOLLHUP`, `EPOLLRDHUP` or `EPOLLERR`, the `eof` will be set to `true`.
 
 **Returns**
 
 - `ev:epoll.event?`: `epoll.event` instance, or `nil` if error occurred.
 - `udata:any`: userdata stored in the event.
 - `disabled:boolean`: `true` if the event has been disabled.
+- `eof:boolean`: `true` if the event flag is set to `EPOLLHUP`, `EPOLLRDHUP` or `EPOLLERR`.
 
 **Return values on error**
 
