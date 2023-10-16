@@ -257,6 +257,8 @@ void poll_evset_del(lua_State *L, poll_event_t *ev)
 
 int poll_unwatch_event(lua_State *L, poll_event_t *ev)
 {
+    int errnum = 0;
+
     if (!ev->enabled) {
         // not watched
         return POLL_EALREADY;
@@ -265,9 +267,16 @@ int poll_unwatch_event(lua_State *L, poll_event_t *ev)
     // unregister event
     if (epoll_ctl(ev->p->fd, EPOLL_CTL_DEL, ev->reg_evt.data.fd, NULL) == -1) {
         switch (errno) {
-        case EBADF:
-        case ENOENT:
+        case EBADF:  // p->fd or data.fd is not a valid fd
+        case ENOENT: // data.fd is not registered with this epoll instance
             break;
+
+        case EPERM:  // data.fd is not supported by epoll
+        case EINVAL: // p->fd is not an epoll fd
+            // NOTE: probably, these errors are caused by bad implementation
+            errnum = errno;
+            break;
+
         default:
             return POLL_ERROR;
         }
@@ -275,6 +284,10 @@ int poll_unwatch_event(lua_State *L, poll_event_t *ev)
     ev->enabled = 0;
     poll_evset_del(L, ev);
 
+    if (errnum) {
+        errno = errnum;
+        return POLL_ERROR;
+    }
     return POLL_OK;
 }
 
