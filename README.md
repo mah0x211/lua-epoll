@@ -516,6 +516,15 @@ return `true` if the event is enabled (watching).
 - `ok:boolean`: `true` if the event is enabled (watching).
 
 
+## ok = ev:is_eof()
+
+return `true` if the event is occurred with `EPOLLHUP`, `EPOLLRDHUP` or `EPOLLERR` flag.
+
+**Returns**
+
+- `ok:boolean`: `true` if the event is occurred with `EPOLLHUP`, `EPOLLRDHUP` or `EPOLLERR` flag.
+
+
 ## ok = ev:is_level()
 
 return `true` if the event trigger is level trigger.
