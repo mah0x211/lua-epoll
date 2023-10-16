@@ -149,6 +149,7 @@ function testcase.consume()
     })
     assert.is_nil(disabled)
     assert.is_nil(eof)
+    assert.is_false(oev:is_eof())
 
     -- test that return nil if consumed all events
     oev = ep:consume()
@@ -173,6 +174,7 @@ function testcase.eof_event_will_be_disabled_in_consume()
     })
     assert.is_true(disabled)
     assert.is_true(eof)
+    assert.is_true(oev:is_eof())
     assert.equal(#ep, 0)
     assert.equal(ev:getinfo('occurred'), {
         ident = Reader:fd(),
@@ -205,6 +207,7 @@ function testcase.oneshot_event_will_be_disabled_in_consume()
     })
     assert.is_true(disabled)
     assert.is_nil(eof)
+    assert.is_false(oev:is_eof())
     assert.equal(#ep, 0)
     assert.equal(ev:getinfo('occurred'), {
         ident = Reader:fd(),
@@ -243,6 +246,7 @@ function testcase.edge_triggered_event_will_not_repeat()
     })
     assert.is_nil(disabled)
     assert.is_nil(eof)
+    assert.is_false(oev:is_eof())
     assert.equal(ev:getinfo('occurred'), {
         ident = Reader:fd(),
         udata = {
