@@ -1,21 +1,24 @@
 name: test
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
 
 jobs:
   test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mah0x211/lua-ci:latest
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
         lua-version:
-          - "5.1"
-          - "5.2"
-          - "5.3"
-          - "5.4"
-          - "luajit-2.0.5"
-
-    runs-on: ${{ matrix.os }}
+          - "5.1.:latest"
+          - "5.2.:latest"
+          - "5.3.:latest"
+          - "5.4.:latest"
+          - "lj-v2.1:latest"
 
     steps:
     -
@@ -24,22 +27,14 @@ jobs:
       with:
         submodules: 'true'
     -
-      name: Setup Lua ${{ matrix.lua-version }}
-      uses: leafo/gh-actions-lua@v8
-      with:
-        luaVersion: ${{ matrix.lua-version }}
-    -
-      name: Setup Luarocks
-      uses: leafo/gh-actions-luarocks@v4
-    -
-      name: Install dependencies for Ubuntu
-      if: matrix.os == 'ubuntu-latest'
+      name: Switch Lua Version
       run: |
-        sudo apt install lcov -y
+        lenv -g use ${{ matrix.lua-version }}
+        lua -v || true
     -
       name: Install
       run: |
-        luarocks make EPOLL_COVERAGE=1
+        EPOLL_COVERAGE=1 luarocks make
     -
       name: Install Tools
       run: |
@@ -55,8 +50,9 @@ jobs:
       run: |
         sh ./covgen.sh
     -
-      name: Upload c coverage to Codecov
+      name: Upload C coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage/lcov.info
         flags: unittests
