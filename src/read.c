@@ -131,7 +131,7 @@ int poll_raed_new(lua_State *L)
     } else if (poll_evset_getflag(L, ev->p->ref_evset_write, fd)) {
         // NOTE: epoll does not support to watch both read and write events on
         // the same fd. so, duplicate fd.
-        dupfd = dup(fd);
+        dupfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
         if (dupfd == -1) {
             // failed to duplicate fd
             lua_pushnil(L);

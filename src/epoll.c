@@ -21,6 +21,7 @@
  */
 
 #include "lua_epoll.h"
+#include <limits.h>
 #include <sys/signalfd.h>
 
 static int check_event_status(lua_State *L, poll_event_t *ev)
@@ -148,7 +149,9 @@ static int wait_lua(lua_State *L)
     poll_t *p      = luaL_checkudata(L, 1, POLL_MT);
     // default timeout: -1(never timeout)
     lua_Number sec = luaL_optnumber(L, 2, -1);
-    int msec       = sec * 1000;
+    int msec       = (sec < 0)                             ? -1 :
+                     (sec >= (lua_Number)(INT_MAX / 1000)) ? INT_MAX :
+                                                             (int)(sec * 1000);
 
     // cleanup current events
     if (cleanup_unconsumed_events(L, p) == POLL_ERROR) {
@@ -275,6 +278,7 @@ static int gc_lua(lua_State *L)
     poll_t *p = lua_touserdata(L, 1);
 
     close(p->fd);
+    unref(L, p->ref_evset);
     unref(L, p->ref_evset_read);
     unref(L, p->ref_evset_write);
     unref(L, p->ref_evset_signal);
@@ -291,6 +295,7 @@ static int new_lua(lua_State *L)
     *p = (poll_t){
         // create poll descriptor
         .fd               = poll_open(),
+        .ref_evset        = LUA_NOREF,
         .ref_evset_read   = LUA_NOREF,
         .ref_evset_write  = LUA_NOREF,
         .ref_evset_signal = LUA_NOREF,
