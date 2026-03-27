@@ -53,7 +53,9 @@ static int check_event_status(lua_State *L, poll_event_t *ev)
     switch (ev->filter) {
     case EVFILT_SIGNAL:
         size = sizeof(struct signalfd_siginfo);
+        /* fall through */
     case EVFILT_TIMER:
+    case EVFILT_TRIGGER:
         if (read(ev->reg_evt.data.fd, (void *)&data, size) == -1) {
             return POLL_ERROR;
         }
@@ -283,6 +285,7 @@ static int gc_lua(lua_State *L)
     unref(L, p->ref_evset_write);
     unref(L, p->ref_evset_signal);
     unref(L, p->ref_evset_timer);
+    unref(L, p->ref_evset_trigger);
     unref(L, p->ref_evlist);
 
     return 0;
@@ -294,13 +297,14 @@ static int new_lua(lua_State *L)
 
     *p = (poll_t){
         // create poll descriptor
-        .fd               = poll_open(),
-        .ref_evset        = LUA_NOREF,
-        .ref_evset_read   = LUA_NOREF,
-        .ref_evset_write  = LUA_NOREF,
-        .ref_evset_signal = LUA_NOREF,
-        .ref_evset_timer  = LUA_NOREF,
-        .ref_evlist       = LUA_NOREF,
+        .fd                = poll_open(),
+        .ref_evset         = LUA_NOREF,
+        .ref_evset_read    = LUA_NOREF,
+        .ref_evset_write   = LUA_NOREF,
+        .ref_evset_signal  = LUA_NOREF,
+        .ref_evset_timer   = LUA_NOREF,
+        .ref_evset_trigger = LUA_NOREF,
+        .ref_evlist        = LUA_NOREF,
     };
 
     if (p->fd == -1) {
@@ -324,6 +328,8 @@ static int new_lua(lua_State *L)
     p->ref_evset_signal = getref(L);
     lua_newtable(L);
     p->ref_evset_timer = getref(L);
+    lua_newtable(L);
+    p->ref_evset_trigger = getref(L);
 
     return 1;
 }
@@ -355,6 +361,7 @@ LUALIB_API int luaopen_epoll(lua_State *L)
     libopen_poll_write(L);
     libopen_poll_signal(L);
     libopen_poll_timer(L);
+    libopen_poll_trigger(L);
 
     // create metatable
     luaL_newmetatable(L, POLL_MT);
