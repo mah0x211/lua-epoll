@@ -142,8 +142,8 @@ print('n:', n)
 local occurred, udata, disabled, eof, err, errno = ep:consume()
 if err then
     print('error:', err, errno)
-elseif ocurred then
-    print('event occurred:', ocurred, udata)
+elseif occurred then
+    print('event occurred:', occurred, udata)
 end
 ```
 
@@ -156,6 +156,7 @@ end
 - Write event: it watches the file descriptor until it becomes writable.
 - Signal event: it watches the signal until it becomes occurred.
 - Timer event: it watches the timer until it becomes expired.
+- Trigger event: it fires a user-controlled wakeup on demand.
 
 
 ## ok, err, errno = ev:renew( [ep] )
@@ -182,16 +183,17 @@ return `true` if the event trigger is level trigger.
 - `ok:boolean`: `true` if the event trigger is level trigger.
 
 
-## ok = ev:as_level()
+## ev, err, errno = ev:as_level()
 
 change the event trigger to level trigger.
 
 **NOTE:** the level trigger is a trigger that is activated while the state of the target is active.
 
-
 **Returns**
 
-- `ok:boolean`: `true` on success.
+- `ev:epoll.event?`: `epoll.event` instance on success, or `nil` if error occurred.
+- `err:string`: error string.
+- `errno:number`: error number.
 
 
 ## ok = ev:is_edge()
@@ -203,7 +205,7 @@ return `true` if the event trigger is edge trigger.
 - `ok:boolean`: `true` if the event trigger is edge trigger.
 
 
-## ok = ev:as_edge()
+## ev, err, errno = ev:as_edge()
 
 change the event trigger to edge trigger.
 
@@ -211,7 +213,9 @@ change the event trigger to edge trigger.
 
 **Returns**
 
-- `ok:boolean`: `true` on success.
+- `ev:epoll.event?`: `epoll.event` instance on success, or `nil` if error occurred.
+- `err:string`: error string.
+- `errno:number`: error number.
 
 
 ## ok = ev:is_oneshot()
@@ -223,7 +227,7 @@ return `true` if the event type is one-shot event.
 - `ok:boolean`: `true` if the event type is one-shot event.
 
 
-## ok = ev:as_oneshot()
+## ev, err, errno = ev:as_oneshot()
 
 change the event type to one-shot event.
 
@@ -231,7 +235,9 @@ change the event type to one-shot event.
 
 **Returns**
 
-- `ok:boolean`: `true` on success.
+- `ev:epoll.event?`: `epoll.event` instance on success, or `nil` if error occurred.
+- `err:string`: error string.
+- `errno:number`: error number.
 
 
 ## ev, err, errno = ev:as_read( fd [, udata] )
@@ -405,7 +411,7 @@ local ep = assert(epoll.new())
 
 -- register a new event for the timer
 local ev = assert(ep:new_event())
-assert(ev:as_timer(123, 150, 'timer expired after 150 milliseconds'))
+assert(ev:as_timer(123, 0.150, 'timer expired after 150 milliseconds'))
 
 -- wait until the timer is expired
 local n, err, errno = ep:wait()
@@ -428,9 +434,73 @@ end
 ```
 
 
+## ev, err, errno = ev:as_trigger( [semaphore [, udata]] )
+
+register a trigger event that fires on demand by calling `ev:trigger()`.
+
+this method changes the meta-table of the `ev` to `epoll.trigger`.
+
+**Parameters**
+
+- `semaphore:boolean`: if `true`, use semaphore mode where each `trigger()` call fires one independent wake-up. if `false` (default), counter mode coalesces multiple `trigger()` calls into a single wake-up.
+- `udata:any`: user data.
+
+**Returns**
+
+- `ev:epoll.trigger?`: `epoll.trigger` instance, or `nil` if error occurred.
+- `err:string`: error string.
+- `errno:number`: error number.
+
+**Example**
+
+```lua
+local epoll = require('epoll')
+local ep = assert(epoll.new())
+
+-- register a trigger event
+local ev = assert(ep:new_event())
+assert(ev:as_trigger(false, 'trigger context'))
+
+-- fire the trigger from anywhere (e.g. another coroutine)
+assert(ev:trigger())
+
+-- wait for the event
+local n, err, errno = ep:wait(1.0)
+if err then
+    print(err, errno)
+    return
+end
+print('n:', n)
+
+-- consume the event
+while true do
+    local occurred, udata, disabled, eof, err, errno = ep:consume()
+    if err then
+        print('error:', err, errno)
+    elseif not occurred then
+        break
+    end
+    print('event occurred:', occurred, udata)
+end
+```
+
+
+## ok, err, errno = ev:trigger()
+
+fire the trigger event to wake up a waiting `ep:wait()` call.
+
+**NOTE:** returns an error if the event is not currently watched (disabled).
+
+**Returns**
+
+- `ok:boolean`: `true` on success.
+- `err:string`: error string.
+- `errno:number`: error number.
+
+
 ## Common Methods
 
-the following methods are common methods of the `epoll.read`, `epoll.write`, `epoll.signal` and `epoll.timer` instances.
+the following methods are common methods of the `epoll.read`, `epoll.write`, `epoll.signal`, `epoll.timer` and `epoll.trigger` instances.
 
 ## t = ev:type()
 
@@ -444,6 +514,7 @@ return the event type.
   - `write`: type of the `epoll.write` instance.
   - `signal`: type of the `epoll.signal` instance.
   - `timer`: type of the `epoll.timer` instance.
+  - `trigger`: type of the `epoll.trigger` instance.
 
 
 ## ok, err, errno = ev:renew( [ep] )
@@ -482,6 +553,7 @@ watch the event.
 - `epoll.write`: file descriptor used as the identifier.
 - `epoll.signal`: signal number used as the identifier.
 - `epoll.timer`: timer identifier used as the identifier.
+- `epoll.trigger`: eventfd file descriptor used as the identifier.
 
 **Returns**
 
@@ -530,7 +602,7 @@ return `true` if the event trigger is level trigger.
 - `ok:boolean`: `true` if the event trigger is level trigger.
 
 
-## ok, err, errno = ev:as_level()
+## ev, err, errno = ev:as_level()
 
 change the event trigger to level trigger.
 
@@ -538,7 +610,7 @@ change the event trigger to level trigger.
 
 **Returns**
 
-- `ok:boolean`: `true` on success.
+- `ev:epoll.event?`: the event instance on success, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -552,7 +624,7 @@ return `true` if the event trigger is edge trigger.
 - `ok:boolean`: `true` if the event trigger is edge trigger.
 
 
-## ok, err, errno = ev:as_edge()
+## ev, err, errno = ev:as_edge()
 
 change the event trigger to edge trigger.
 
@@ -560,7 +632,7 @@ change the event trigger to edge trigger.
 
 **Returns**
 
-- `ok:boolean`: `true` on success.
+- `ev:epoll.event?`: the event instance on success, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -574,7 +646,7 @@ return `true` if the event type is one-shot event.
 - `ok:boolean`: `true` if the event type is one-shot event.
 
 
-## ok, err, errno = ev:as_oneshot()
+## ev, err, errno = ev:as_oneshot()
 
 change the event type to one-shot event.
 
@@ -582,7 +654,7 @@ change the event type to one-shot event.
 
 **Returns**
 
-- `ok:boolean`: `true` on success.
+- `ev:epoll.event?`: the event instance on success, or `nil` if error occurred.
 - `err:string`: error string.
 - `errno:number`: error number.
 
@@ -611,8 +683,6 @@ if the `udata` is specified then it set the user data of the event and return th
 
 get the information of the specified event.
 
-**NOTE:** if the `EV_ERROR` flag is present in the flags, then the `data` treated as the `errno`.
-
 **Parameters**
 
 - `event:string`: event name as follows.
@@ -626,4 +696,5 @@ get the information of the specified event.
   - `udata:any`: user data of the event.
   - `edge:boolean`: `true` if the event trigger is edge trigger.
   - `oneshot:boolean`: `true` if the event type is one-shot event.
+  - `eof:boolean`: `true` if the event was closed or errored (`EPOLLHUP`, `EPOLLRDHUP` or `EPOLLERR`). only present when set.
 
