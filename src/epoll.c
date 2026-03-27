@@ -275,6 +275,7 @@ static int gc_lua(lua_State *L)
     poll_t *p = lua_touserdata(L, 1);
 
     close(p->fd);
+    unref(L, p->ref_evset);
     unref(L, p->ref_evset_read);
     unref(L, p->ref_evset_write);
     unref(L, p->ref_evset_signal);
@@ -291,6 +292,7 @@ static int new_lua(lua_State *L)
     *p = (poll_t){
         // create poll descriptor
         .fd               = poll_open(),
+        .ref_evset        = LUA_NOREF,
         .ref_evset_read   = LUA_NOREF,
         .ref_evset_write  = LUA_NOREF,
         .ref_evset_signal = LUA_NOREF,
