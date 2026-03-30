@@ -36,7 +36,8 @@ static inline void event_closefd(poll_event_t *ev)
 
     case EVFILT_SIGNAL:
     case EVFILT_TIMER:
-        // close signalfd or timerfd
+    case EVFILT_TRIGGER:
+        // close signalfd, timerfd, or eventfd
         close(ev->reg_evt.data.fd);
         ev->reg_evt.data.fd = -1;
         break;
@@ -146,6 +147,9 @@ static void evset_setflag(lua_State *L, poll_event_t *ev)
     case EVFILT_TIMER:
         ref_evset = ev->p->ref_evset_timer;
         break;
+    case EVFILT_TRIGGER:
+        ref_evset = ev->p->ref_evset_trigger;
+        break;
     }
 
     pushref(L, ref_evset);
@@ -170,6 +174,9 @@ static void evset_unsetflag(lua_State *L, poll_event_t *ev)
         break;
     case EVFILT_TIMER:
         ref_evset = ev->p->ref_evset_timer;
+        break;
+    case EVFILT_TRIGGER:
+        ref_evset = ev->p->ref_evset_trigger;
         break;
     }
 

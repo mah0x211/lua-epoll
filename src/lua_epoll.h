@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdint.h>
 #include <string.h>
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -61,10 +62,11 @@ static inline void pushref(lua_State *L, int ref)
 # define poll_open() epoll_create(1)
 #endif
 
-#define EVFILT_READ   0x1
-#define EVFILT_WRITE  0x2
-#define EVFILT_SIGNAL 0x3
-#define EVFILT_TIMER  0x4
+#define EVFILT_READ    0x1
+#define EVFILT_WRITE   0x2
+#define EVFILT_SIGNAL  0x3
+#define EVFILT_TIMER   0x4
+#define EVFILT_TRIGGER 0x5
 
 #define EV_CLEAR   EPOLLET
 #define EV_ONESHOT EPOLLONESHOT
@@ -84,6 +86,7 @@ typedef struct {
     int ref_evset_write;
     int ref_evset_signal;
     int ref_evset_timer;
+    int ref_evset_trigger;
     int ref_evlist;
     int nreg;
     int nevt;
@@ -103,23 +106,26 @@ typedef struct {
     event_t occ_evt; // occurred event
 } poll_event_t;
 
-#define POLL_MT        "epoll"
-#define POLL_EVENT_MT  "epoll.event"
-#define POLL_READ_MT   "epoll.read"
-#define POLL_WRITE_MT  "epoll.write"
-#define POLL_SIGNAL_MT "epoll.signal"
-#define POLL_TIMER_MT  "epoll.timer"
+#define POLL_MT         "epoll"
+#define POLL_EVENT_MT   "epoll.event"
+#define POLL_READ_MT    "epoll.read"
+#define POLL_WRITE_MT   "epoll.write"
+#define POLL_SIGNAL_MT  "epoll.signal"
+#define POLL_TIMER_MT   "epoll.timer"
+#define POLL_TRIGGER_MT "epoll.trigger"
 
 void libopen_poll_event(lua_State *L);
 void libopen_poll_read(lua_State *L);
 void libopen_poll_write(lua_State *L);
 void libopen_poll_signal(lua_State *L);
 void libopen_poll_timer(lua_State *L);
+void libopen_poll_trigger(lua_State *L);
 
 int poll_raed_new(lua_State *L);
 int poll_write_new(lua_State *L);
 int poll_signal_new(lua_State *L);
 int poll_timer_new(lua_State *L);
+int poll_trigger_new(lua_State *L);
 
 int poll_event_gc_lua(lua_State *L);
 int poll_event_tostring_lua(lua_State *L, const char *tname);
